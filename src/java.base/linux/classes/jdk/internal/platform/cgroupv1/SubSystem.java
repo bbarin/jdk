@@ -62,7 +62,7 @@ public class SubSystem {
                 else {
                     if (root.indexOf(cgroupPath) == 0) {
                         if (cgroupPath.length() > root.length()) {
-                            String cgroupSubstr = cgroupPath.substring(root.length());
+                            var cgroupSubstr = cgroupPath.substring(root.length());
                             path = mountPoint + cgroupSubstr;
                         }
                     }
@@ -89,9 +89,8 @@ public class SubSystem {
     public static String getStringValue(SubSystem subsystem, String parm) {
         if (subsystem == null) return null;
 
-        try(BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(subsystem.path(), parm))) {
-            String line = bufferedReader.readLine();
-            return line;
+        try(var bufferedReader = Files.newBufferedReader(Paths.get(subsystem.path(), parm))) {
+            return bufferedReader.readLine();
         }
         catch (IOException e) {
             return null;
@@ -101,31 +100,28 @@ public class SubSystem {
 
     public static long getLongValue(SubSystem subsystem, String parm) {
         String strval = getStringValue(subsystem, parm);
-        long retval = 0;
-
+        
         if (strval == null) return 0L;
 
         try {
-            retval = Long.parseLong(strval);
+            return Long.parseLong(strval);
         } catch (NumberFormatException e) {
             // For some properties (e.g. memory.limit_in_bytes) we may overflow the range of signed long.
             // In this case, return Long.max
-            BigInteger b = new BigInteger(strval);
+            var b = new BigInteger(strval);
             if (b.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) > 0) {
                 return Long.MAX_VALUE;
             }
         }
-        return retval;
+        return 0;
     }
 
     public static double getDoubleValue(SubSystem subsystem, String parm) {
-        String strval = getStringValue(subsystem, parm);
+        var strval = getStringValue(subsystem, parm);
 
         if (strval == null) return 0L;
 
-        double retval = Double.parseDouble(strval);
-
-        return retval;
+        return Double.parseDouble(strval);
     }
 
     /**
@@ -183,7 +179,7 @@ public class SubSystem {
 
         if (range == null) return ints;
 
-        ArrayList<Integer> results = new ArrayList<>();
+        var results = new ArrayList<Integer>();
         String strs[] = range.split(",");
         for (String str : strs) {
             if (str.contains("-")) {
